@@ -6,6 +6,8 @@
  */
 package net.yadan.banana.memory.block;
 
+import java.nio.IntBuffer;
+
 import net.yadan.banana.memory.IBlockAllocator;
 import net.yadan.banana.memory.IBuffer;
 import net.yadan.banana.memory.MemInitializer;
@@ -490,5 +492,51 @@ public class BlockAllocator implements IBlockAllocator {
   @Override
   public void setDouble(int pointer, int offset_in_data, double data) {
     setLong(pointer, offset_in_data, Double.doubleToLongBits(data));
+  }
+  
+  public void writeToIntBuffer(IntBuffer buffer) {
+	  buffer.put(this.m_blockSize);
+	  
+	  buffer.put(this.m_watermark);
+	  buffer.put(this.m_free);
+	  buffer.put(this.m_head);
+
+	  buffer.put(this.m_buffer.length);
+	  buffer.put(this.m_buffer);
+
+	  buffer.put(this.m_maxCapacity);	  
+	  
+	  ((PrototypeInitializer)this.m_initializer).writeToIntBuffer(buffer);
+
+	  long growthFactorBits = Double.doubleToRawLongBits(this.m_growthFactor);
+	  buffer.put((int)growthFactorBits);
+	  buffer.put((int)(growthFactorBits >> 32));
+
+	  buffer.put(this.m_reservedBlocks);	  
+  }
+
+  private BlockAllocator(int blockSize) {
+	  this.m_blockSize = blockSize;
+  }
+  
+  public static BlockAllocator readFromIntBuffer(IntBuffer buffer) {
+	  BlockAllocator blockAllocator = new BlockAllocator(buffer.get());
+
+	  blockAllocator.m_watermark = buffer.get();
+	  blockAllocator.m_free = buffer.get();
+	  blockAllocator.m_head = buffer.get();	  
+
+	  blockAllocator.m_buffer = new int[buffer.get()];
+	  buffer.get(blockAllocator.m_buffer);
+
+	  blockAllocator.m_maxCapacity = buffer.get();
+	  
+	  blockAllocator.m_initializer = PrototypeInitializer.readFromIntBuffer(buffer);
+
+	  blockAllocator.m_growthFactor = Double.longBitsToDouble(((long)buffer.get()) | (((long)buffer.get()) << 32));
+
+	  blockAllocator.m_reservedBlocks = buffer.get();	  
+	  
+	  return blockAllocator;
   }
 }

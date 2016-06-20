@@ -6,6 +6,8 @@
  */
 package net.yadan.banana.map;
 
+import java.nio.IntBuffer;
+
 import net.yadan.banana.DebugLevel;
 import net.yadan.banana.DefaultFormatter;
 import net.yadan.banana.Formatter;
@@ -470,6 +472,45 @@ public class HashMap implements IHashMap {
   @Override
   public Formatter getFormatter() {
     return m_formatter;
+  }
+  
+  public void writeToIntBuffer(IntBuffer buffer) {
+	  long loadFactorBits = Double.doubleToRawLongBits(this.m_loadFactor);
+	  buffer.put((int)loadFactorBits);
+	  buffer.put((int)(loadFactorBits >> 32));
+	  
+	  long growthFactorBits = Double.doubleToRawLongBits(this.m_growthFactor);
+	  buffer.put((int)growthFactorBits);
+	  buffer.put((int)(growthFactorBits >> 32));
+	  
+	  buffer.put(m_table.length);
+	  buffer.put(m_table);
+
+	  buffer.put(m_size);
+	  buffer.put(m_threshold);	  
+
+	  ((TreeAllocator)m_memory).writeToIntBuffer(buffer);
+  }
+
+  private HashMap() {
+	  
+  }
+  
+  public static HashMap readFromIntBuffer(IntBuffer buffer) {
+	  HashMap hashMap = new HashMap();
+	  
+	  hashMap.m_loadFactor = Double.longBitsToDouble(((long)buffer.get()) | (((long)buffer.get()) << 32));
+	  hashMap.m_growthFactor = Double.longBitsToDouble(((long)buffer.get()) | (((long)buffer.get()) << 32));
+	  
+	  hashMap.m_table = new int[buffer.get()];
+	  buffer.get(hashMap.m_table);
+
+	  hashMap.m_size = buffer.get();
+	  hashMap.m_threshold = buffer.get();
+	  
+	  hashMap.m_memory = TreeAllocator.readFromIntBuffer(buffer);
+	  
+	  return hashMap;
   }
 
 }

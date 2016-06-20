@@ -6,6 +6,8 @@
  */
 package net.yadan.banana.memory.initializers;
 
+import java.nio.IntBuffer;
+
 import net.yadan.banana.memory.IPrimitiveAccess;
 import net.yadan.banana.memory.MemInitializer;
 
@@ -24,5 +26,16 @@ public class PrototypeInitializer implements MemInitializer {
   @Override
   public void initialize(IPrimitiveAccess mem, int pointer, int blockSize) {
     mem.setInts(pointer, 0, prototype, 0, prototype.length);
+  }
+  
+  public void writeToIntBuffer(IntBuffer buffer) {
+	  buffer.put(this.prototype.length);
+	  buffer.put(this.prototype);
+  }
+  
+  public static PrototypeInitializer readFromIntBuffer(IntBuffer buffer) {
+	  int prototype[] = new int[buffer.get()];
+	  buffer.get(prototype);
+	  return new PrototypeInitializer(prototype);
   }
 }

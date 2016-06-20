@@ -6,6 +6,7 @@
  */
 package net.yadan.banana.memory.malloc;
 
+import java.nio.IntBuffer;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -1018,5 +1019,13 @@ public class TreeAllocator implements IMemAllocator {
   @Override
   public void setDouble(int pointer, int offset_in_data, double data) {
     setLong(pointer, offset_in_data, Double.doubleToLongBits(data));
+  }
+  
+  public void writeToIntBuffer(IntBuffer buffer) {
+	  ((BlockAllocator)m_blocks).writeToIntBuffer(buffer);
+  }
+
+  public static TreeAllocator readFromIntBuffer(IntBuffer buffer) {
+	  return new TreeAllocator(BlockAllocator.readFromIntBuffer(buffer));
   }
 }
