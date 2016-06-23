@@ -47,7 +47,7 @@
 
 	<properties>
 		<air.check.skip-enforcer>true</air.check.skip-enforcer>
-		<air.check.fail-findbugs>false</air.check.fail-findbugs>
+		<air.check.skip-findbugs>true</air.check.skip-findbugs>
 		<air.check.fail-license>false</air.check.fail-license>
 		<air.check.fail-pmd>false</air.check.fail-pmd>
 		<dep.junit.version>4.11</dep.junit.version>
