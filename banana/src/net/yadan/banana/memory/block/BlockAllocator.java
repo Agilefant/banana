@@ -539,4 +539,24 @@ public class BlockAllocator implements IBlockAllocator {
 	  
 	  return blockAllocator;
   }
+  
+  public BlockAllocator deepCopy() {
+	  BlockAllocator blockAllocator = new BlockAllocator(this.m_blockSize);
+
+	  blockAllocator.m_watermark = this.m_watermark;
+	  blockAllocator.m_free = this.m_free;
+	  blockAllocator.m_head = this.m_head;
+
+	  blockAllocator.m_buffer = this.m_buffer.clone();
+
+	  blockAllocator.m_maxCapacity = this.m_maxCapacity;
+	  
+	  blockAllocator.m_initializer = this.m_initializer;
+
+	  blockAllocator.m_growthFactor = this.m_growthFactor;
+
+	  blockAllocator.m_reservedBlocks = this.m_reservedBlocks;	  
+	  
+	  return blockAllocator;	  
+  }
 }

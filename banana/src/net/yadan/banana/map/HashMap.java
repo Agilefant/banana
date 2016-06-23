@@ -512,5 +512,21 @@ public class HashMap implements IHashMap {
 	  
 	  return hashMap;
   }
+  
+  public HashMap deepCopy() {
+	  HashMap hashMap = new HashMap();
+
+	  hashMap.m_loadFactor = this.m_loadFactor;
+	  hashMap.m_growthFactor = this.m_growthFactor;
+	  
+	  hashMap.m_table = this.m_table.clone();
+
+	  hashMap.m_size = this.m_size;
+	  hashMap.m_threshold = this.m_threshold;
+	  
+	  hashMap.m_memory = ((TreeAllocator)this.m_memory).deepCopy();	  
+	  
+	  return hashMap;
+  }
 
 }

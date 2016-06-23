@@ -1028,4 +1028,8 @@ public class TreeAllocator implements IMemAllocator {
   public static TreeAllocator readFromIntBuffer(IntBuffer buffer) {
 	  return new TreeAllocator(BlockAllocator.readFromIntBuffer(buffer));
   }
+  
+  public TreeAllocator deepCopy() {
+	  return new TreeAllocator(((BlockAllocator)m_blocks).deepCopy());
+  }
 }
