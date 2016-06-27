@@ -6,6 +6,8 @@
  */
 package net.yadan.banana.list;
 
+import java.nio.IntBuffer;
+
 import net.yadan.banana.DebugLevel;
 import net.yadan.banana.DefaultFormatter;
 import net.yadan.banana.Formatter;
@@ -31,6 +33,10 @@ public class LinkedList implements ILinkedList {
   private int m_size;
   private DebugLevel m_debugLevel;
   private Formatter m_linkFormatter;
+
+  private LinkedList() {
+	  
+  }
 
   public LinkedList(int maxBlocks, int blockSize, double growthFactor) {
     init(new TreeAllocator(maxBlocks, blockSize + RESERVED_SIZE, growthFactor));
@@ -331,5 +337,41 @@ public class LinkedList implements ILinkedList {
   @Override
   public void getChars(int pointer, int src_offset, char[] dst_data, int dst_pos, int num_chars) {
     m_memory.getChars(pointer, src_offset + DATA_OFFSET, dst_data, dst_pos, num_chars);
+  }
+
+  public void writeToIntBuffer(IntBuffer buffer) {
+	buffer.put(m_head);
+    buffer.put(m_tail);
+    buffer.put(m_size);  
+
+    ((TreeAllocator)m_memory).writeToIntBuffer(buffer);
+  }
+  
+  public static LinkedList readFromIntBuffer(IntBuffer buffer) {
+	LinkedList linkedList = new LinkedList();
+	  
+	linkedList.m_head = buffer.get();
+	linkedList.m_tail = buffer.get();
+	linkedList.m_size = buffer.get();
+	  
+	linkedList.m_memory = TreeAllocator.readFromIntBuffer(buffer);
+
+    linkedList.m_linkFormatter = new DefaultFormatter();
+	  
+	return linkedList;
+  }
+  
+  public LinkedList deepCopy() {
+	LinkedList linkedList = new LinkedList();
+
+	linkedList.m_head = this.m_head;
+	linkedList.m_tail = this.m_tail;
+	linkedList.m_size = this.m_size;
+	  
+	linkedList.m_memory = ((TreeAllocator)this.m_memory).deepCopy();	
+
+    linkedList.m_linkFormatter = new DefaultFormatter();  
+	  
+	return linkedList;
   }
 }
