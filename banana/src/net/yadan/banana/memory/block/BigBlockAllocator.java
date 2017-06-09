@@ -12,6 +12,8 @@ import net.yadan.banana.memory.MemInitializer;
 import net.yadan.banana.memory.OutOfMemoryException;
 import net.yadan.banana.memory.initializers.PrototypeInitializer;
 
+import java.nio.ByteBuffer;
+
 
 /**
  * @author omry
@@ -590,5 +592,10 @@ public class BigBlockAllocator implements IBlockAllocator {
         num_copied++;
       }
     }
+  }
+
+  @Override
+  public void writeToByteBuffer(ByteBuffer buffer) {
+      throw new UnsupportedOperationException();
   }
 }

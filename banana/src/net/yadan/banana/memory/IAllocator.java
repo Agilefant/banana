@@ -6,6 +6,8 @@
  */
 package net.yadan.banana.memory;
 
+import java.nio.ByteBuffer;
+
 /**
  * Methods common to all allocators.
  *
@@ -101,4 +103,6 @@ public interface IAllocator extends IPrimitiveAccess {
    * @param pointer
    */
   void initialize(int pointer);
+
+  void writeToByteBuffer(ByteBuffer buffer);
 }

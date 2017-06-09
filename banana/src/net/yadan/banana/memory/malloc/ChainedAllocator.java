@@ -14,6 +14,8 @@ import net.yadan.banana.memory.OutOfBoundsAccess;
 import net.yadan.banana.memory.OutOfMemoryException;
 import net.yadan.banana.memory.block.BlockAllocator;
 
+import java.nio.ByteBuffer;
+
 
 public class ChainedAllocator implements IMemAllocator {
 
@@ -719,5 +721,10 @@ public class ChainedAllocator implements IMemAllocator {
     } else {
       m_blocks.getChars(pointer, src_offset_in_record, dst_data, dst_pos, num_chars);
     }
+  }
+
+  @Override
+  public void writeToByteBuffer(ByteBuffer buffer) {
+    throw new UnsupportedOperationException();
   }
 }

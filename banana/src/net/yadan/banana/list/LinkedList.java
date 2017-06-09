@@ -6,6 +6,7 @@
  */
 package net.yadan.banana.list;
 
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import net.yadan.banana.DebugLevel;
@@ -339,22 +340,26 @@ public class LinkedList implements ILinkedList {
     m_memory.getChars(pointer, src_offset + DATA_OFFSET, dst_data, dst_pos, num_chars);
   }
 
-  public void writeToIntBuffer(IntBuffer buffer) {
-	buffer.put(m_head);
-    buffer.put(m_tail);
-    buffer.put(m_size);  
+  public void writeToByteBuffer(ByteBuffer buffer) {
+    IntBuffer intBuffer = buffer.asIntBuffer();
 
-    ((TreeAllocator)m_memory).writeToIntBuffer(buffer);
+    intBuffer.put(m_head);
+    intBuffer.put(m_tail);
+    intBuffer.put(m_size);
+
+    ((TreeAllocator)m_memory).writeToByteBuffer(buffer);
   }
   
-  public static LinkedList readFromIntBuffer(IntBuffer buffer) {
+  public static LinkedList readFromByteBuffer(ByteBuffer buffer) {
+    IntBuffer intBuffer = buffer.asIntBuffer();
+
 	LinkedList linkedList = new LinkedList();
 	  
-	linkedList.m_head = buffer.get();
-	linkedList.m_tail = buffer.get();
-	linkedList.m_size = buffer.get();
+	linkedList.m_head = intBuffer.get();
+	linkedList.m_tail = intBuffer.get();
+	linkedList.m_size = intBuffer.get();
 	  
-	linkedList.m_memory = TreeAllocator.readFromIntBuffer(buffer);
+	linkedList.m_memory = TreeAllocator.readFromByteBuffer(buffer);
 
     linkedList.m_linkFormatter = new DefaultFormatter();
 	  

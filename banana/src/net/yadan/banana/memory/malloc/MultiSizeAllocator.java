@@ -6,6 +6,7 @@
  */
 package net.yadan.banana.memory.malloc;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import net.yadan.banana.memory.IBlockAllocator;
@@ -343,5 +344,10 @@ public class MultiSizeAllocator implements IMemAllocator {
     int idx = getSizeIndex(pointer);
     pointer = extractPointer(pointer);
     m_allocators[idx].getChars(pointer, src_offset, dst_data, dst_pos, num_chars);
+  }
+
+  @Override
+  public void writeToByteBuffer(ByteBuffer buffer) {
+      throw new UnsupportedOperationException();
   }
 }

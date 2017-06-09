@@ -6,6 +6,7 @@
  */
 package net.yadan.banana.map;
 
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import net.yadan.banana.DebugLevel;
@@ -474,42 +475,46 @@ public class HashMap implements IHashMap {
     return m_formatter;
   }
   
-  public void writeToIntBuffer(IntBuffer buffer) {
-	  long loadFactorBits = Double.doubleToRawLongBits(this.m_loadFactor);
-	  buffer.put((int)loadFactorBits);
-	  buffer.put((int)(loadFactorBits >> 32));
-	  
-	  long growthFactorBits = Double.doubleToRawLongBits(this.m_growthFactor);
-	  buffer.put((int)growthFactorBits);
-	  buffer.put((int)(growthFactorBits >> 32));
-	  
-	  buffer.put(m_table.length);
-	  buffer.put(m_table);
+  public void writeToByteBuffer(ByteBuffer buffer) {
 
-	  buffer.put(m_size);
-	  buffer.put(m_threshold);	  
+      buffer.putDouble(this.m_loadFactor);
+      buffer.putDouble(this.m_growthFactor);
+      buffer.putInt(this.m_table.length);
 
-	  ((TreeAllocator)m_memory).writeToIntBuffer(buffer);
+      IntBuffer intBuffer = buffer.asIntBuffer();
+      int startingPosition = intBuffer.position();
+      intBuffer.put(this.m_table);
+      buffer.position(buffer.position() + (intBuffer.position()-startingPosition)*4);
+
+      buffer.putInt(this.m_size);
+      buffer.putInt(this.m_threshold);
+
+	  ((TreeAllocator)m_memory).writeToByteBuffer(buffer);
   }
 
   private HashMap() {
 	  
   }
   
-  public static HashMap readFromIntBuffer(IntBuffer buffer) {
+  public static HashMap readFromByteBuffer(ByteBuffer buffer) {
+
 	  HashMap hashMap = new HashMap();
 	  
-	  hashMap.m_loadFactor = Double.longBitsToDouble(((long)buffer.get()) | (((long)buffer.get()) << 32));
-	  hashMap.m_growthFactor = Double.longBitsToDouble(((long)buffer.get()) | (((long)buffer.get()) << 32));
-	  
-	  hashMap.m_table = new int[buffer.get()];
-	  buffer.get(hashMap.m_table);
+	  hashMap.m_loadFactor = buffer.getDouble();
+	  hashMap.m_growthFactor = buffer.getDouble();
 
-	  hashMap.m_size = buffer.get();
-	  hashMap.m_threshold = buffer.get();
-	  
-	  hashMap.m_memory = TreeAllocator.readFromIntBuffer(buffer);
-	  
+	  hashMap.m_table = new int[buffer.getInt()];
+
+      IntBuffer intBuffer = buffer.asIntBuffer();
+      int startingPosition = intBuffer.position();
+      intBuffer.get(hashMap.m_table);
+      buffer.position(buffer.position() + (intBuffer.position()-startingPosition)*4);
+
+	  hashMap.m_size = buffer.getInt();
+	  hashMap.m_threshold = buffer.getInt();
+
+	  hashMap.m_memory = TreeAllocator.readFromByteBuffer(buffer);
+
 	  return hashMap;
   }
   

@@ -6,6 +6,8 @@
  */
 package net.yadan.banana.memory.malloc;
 
+import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -1021,12 +1023,26 @@ public class TreeAllocator implements IMemAllocator {
     setLong(pointer, offset_in_data, Double.doubleToLongBits(data));
   }
   
-  public void writeToIntBuffer(IntBuffer buffer) {
-	  ((BlockAllocator)m_blocks).writeToIntBuffer(buffer);
+  public void writeToByteBuffer(ByteBuffer buffer) {
+      byte[] classNameBytes = m_blocks.getClass().getName().getBytes();
+      buffer.putInt(classNameBytes.length);
+      buffer.put(classNameBytes);
+
+	  m_blocks.writeToByteBuffer(buffer);
   }
 
-  public static TreeAllocator readFromIntBuffer(IntBuffer buffer) {
-	  return new TreeAllocator(BlockAllocator.readFromIntBuffer(buffer));
+  public static TreeAllocator readFromByteBuffer(ByteBuffer buffer) {
+      byte classNameBytes[] = new byte[buffer.getInt()];
+      buffer.get(classNameBytes);
+
+      try {
+          Class<?> blockAllocatorClass = Class.forName(new String(classNameBytes));
+          Method readMethod = blockAllocatorClass.getMethod("readFromByteBuffer", ByteBuffer.class);
+
+          return new TreeAllocator((IBlockAllocator)readMethod.invoke(null, buffer));
+      } catch(Exception e) {
+          throw new RuntimeException();
+      }
   }
   
   public TreeAllocator deepCopy() {
