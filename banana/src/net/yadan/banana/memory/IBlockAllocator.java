@@ -6,6 +6,8 @@
  */
 package net.yadan.banana.memory;
 
+import java.nio.ByteBuffer;
+
 /**
  * Block allocator interface
  *
@@ -34,5 +36,9 @@ public interface IBlockAllocator extends IAllocator {
    *          number of ints to copy
    */
   public void memCopy(int srcPtr, int srcPos, int dstPtr, int dstPos, int length);
+
+  public void writeToByteBuffer(ByteBuffer buffer);
+
+  public void readFromByteBuffer(ByteBuffer buffer);
 
 }

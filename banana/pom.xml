@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>net.yadan.banana</groupId>
 		<artifactId>banana-parent</artifactId>
-		<version>0.2-CUSTOM</version>
+		<version>0.3-CUSTOM</version>
 	</parent>
 
 	<artifactId>banana</artifactId>

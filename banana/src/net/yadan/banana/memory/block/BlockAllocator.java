@@ -31,7 +31,7 @@ import net.yadan.banana.memory.initializers.PrototypeInitializer;
  */
 public class BlockAllocator implements IBlockAllocator {
 
-  protected final int m_blockSize;
+  protected int m_blockSize;
 
   private int m_watermark;
   private int m_free;
@@ -49,6 +49,9 @@ public class BlockAllocator implements IBlockAllocator {
 
   private int m_reservedBlocks;
 
+  public BlockAllocator() {
+    this(1,1);
+  }
 
   /**
    * @param maxBlocks number of blocks to reserve space for
@@ -509,7 +512,7 @@ public class BlockAllocator implements IBlockAllocator {
 
       buffer.putInt(this.m_maxCapacity);
 	  ((PrototypeInitializer)this.m_initializer).writeToByteBuffer(buffer);
-      buffer.putDouble(this.m_growthFactor);
+      buffer.putLong(Double.doubleToLongBits(this.m_growthFactor));
       buffer.putInt(this.m_reservedBlocks);
   }
 
@@ -517,29 +520,27 @@ public class BlockAllocator implements IBlockAllocator {
 	  this.m_blockSize = blockSize;
   }
   
-  public static BlockAllocator readFromByteBuffer(ByteBuffer buffer) {
+  public void readFromByteBuffer(ByteBuffer buffer) {
 
-	  BlockAllocator blockAllocator = new BlockAllocator(buffer.getInt());
+      this.m_blockSize = buffer.getInt();
 
-	  blockAllocator.m_watermark = buffer.getInt();
-	  blockAllocator.m_free = buffer.getInt();
-	  blockAllocator.m_head = buffer.getInt();
+      this.m_watermark = buffer.getInt();
+      this.m_free = buffer.getInt();
+      this.m_head = buffer.getInt();
 
-	  blockAllocator.m_buffer = new int[buffer.getInt()];
+      this.m_buffer = new int[buffer.getInt()];
 
       IntBuffer intBuffer = buffer.asIntBuffer();
       int startingPosition = intBuffer.position();
-      intBuffer.get(blockAllocator.m_buffer);
+      intBuffer.get(this.m_buffer);
       buffer.position(buffer.position() + (intBuffer.position()-startingPosition)*4);
 
-	  blockAllocator.m_maxCapacity = buffer.getInt();
-	  blockAllocator.m_initializer = PrototypeInitializer.readFromByteBuffer(buffer);
-	  blockAllocator.m_growthFactor = buffer.getDouble();
-	  blockAllocator.m_reservedBlocks = buffer.getInt();
-
-      return blockAllocator;
+      this.m_maxCapacity = buffer.getInt();
+      this.m_initializer = PrototypeInitializer.readFromByteBuffer(buffer);
+      this.m_growthFactor = Double.longBitsToDouble(buffer.getLong());
+      this.m_reservedBlocks = buffer.getInt();
   }
-  
+
   public BlockAllocator deepCopy() {
 	  BlockAllocator blockAllocator = new BlockAllocator(this.m_blockSize);
 

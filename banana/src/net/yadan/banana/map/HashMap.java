@@ -477,8 +477,8 @@ public class HashMap implements IHashMap {
   
   public void writeToByteBuffer(ByteBuffer buffer) {
 
-      buffer.putDouble(this.m_loadFactor);
-      buffer.putDouble(this.m_growthFactor);
+      buffer.putLong(Double.doubleToLongBits(this.m_loadFactor));
+      buffer.putLong(Double.doubleToLongBits(this.m_growthFactor));
       buffer.putInt(this.m_table.length);
 
       IntBuffer intBuffer = buffer.asIntBuffer();
@@ -500,8 +500,8 @@ public class HashMap implements IHashMap {
 
 	  HashMap hashMap = new HashMap();
 	  
-	  hashMap.m_loadFactor = buffer.getDouble();
-	  hashMap.m_growthFactor = buffer.getDouble();
+	  hashMap.m_loadFactor = Double.longBitsToDouble(buffer.getLong());
+	  hashMap.m_growthFactor = Double.longBitsToDouble(buffer.getLong());
 
 	  hashMap.m_table = new int[buffer.getInt()];
 

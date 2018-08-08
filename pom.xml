@@ -10,7 +10,7 @@
 	<groupId>net.yadan.banana</groupId>
 	<artifactId>banana-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>0.2-CUSTOM</version>
+	<version>0.3-CUSTOM</version>
 
 	<name>${project.artifactId}</name>
 	<description>A primitive collection library with it's own memory management</description>

@@ -8,7 +8,6 @@ package net.yadan.banana.memory.malloc;
 
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -453,8 +452,7 @@ public class TreeAllocator implements IMemAllocator {
       int currentLevelCapacity = maximumCapacityForNumBlocks(numBlocks);
 
       assert src_pos >= 0 : "Negative src_pos " + src_pos;
-      assert dst_offset_in_record + length <= numBlocks * m_blockSize : String.format(
-          "src_pos + length > memSize : %d + %d < %d", src_pos, length, numBlocks * m_blockSize);
+      assert dst_offset_in_record + length <= numBlocks * m_blockSize : "src_pos + length > memSize : "+ src_pos + " + " + length + " < " + (numBlocks * m_blockSize);
 
       int left_to_copy = length;
       int dst_offset = dst_offset_in_record;
@@ -514,9 +512,7 @@ public class TreeAllocator implements IMemAllocator {
       int num_ints = 1 + (num_chars - 1) / 2; // ceil (num_chars / 2)
 
       assert src_char_pos >= 0 : "Negative src_pos " + src_char_pos;
-      assert dst_int_offset + num_ints <= numBlocks * m_blockSize : String
-          .format("dst_offset_in_record + num_ints > memSize : %d + %d < %d", dst_int_offset, num_ints, numBlocks
-              * m_blockSize);
+      assert dst_int_offset + num_ints <= numBlocks * m_blockSize : "dst_offset_in_record + num_ints > memSize : " + dst_int_offset + " + " + num_ints + " < " + (numBlocks * m_blockSize);
 
       int chars_left_to_copy = num_chars;
       for (int src_offset_chars = src_char_pos; src_offset_chars < num_chars;) {
@@ -577,8 +573,7 @@ public class TreeAllocator implements IMemAllocator {
       int num_ints = 1 + (num_chars - 1) / 2; // ceil (num_chars / 2)
 
       assert dst_char_pos >= 0 : "Negative dst_pos " + dst_char_pos;
-      assert src_int_offset + num_ints <= numBlocks * m_blockSize : String.format(
-          "dst_pos + num_ints > memSize : %d + %d < %d", dst_char_pos, num_ints, numBlocks * m_blockSize);
+      assert src_int_offset + num_ints <= numBlocks * m_blockSize : "dst_pos + num_ints > memSize : " + dst_char_pos +" + " + num_ints + " < " + (numBlocks * m_blockSize);
 
       int chars_left_to_copy = num_chars;
       for (int dst_offset_chars = dst_char_pos; dst_offset_chars < num_chars;) {
@@ -632,8 +627,7 @@ public class TreeAllocator implements IMemAllocator {
       int currentLevelCapacity = maximumCapacityForNumBlocks(numBlocks);
 
       assert src_pos >= 0 : "Negative src_pos " + src_pos;
-      assert src_pos + length <= numBlocks * m_blockSize : String.format("src_pos + length > memSize : %d + %d < %d",
-          src_pos, length, numBlocks * m_blockSize);
+      assert src_pos + length <= numBlocks * m_blockSize : "src_pos + length > memSize : " + src_pos + " + " + length + " < " + (numBlocks * m_blockSize);
 
       int left_to_copy = length;
       int src1_offset = src_pos;
@@ -685,8 +679,7 @@ public class TreeAllocator implements IMemAllocator {
       int currentLevelCapacity = maximumCapacityForNumBlocks(numBlocks);
 
       assert dst_pos >= 0 : "Negative dst_pos " + dst_pos;
-      assert src_offset_in_record + length <= numBlocks * m_blockSize : String.format(
-          "dst_pos + length > memSize : %d + %d < %d", dst_pos, length, numBlocks * m_blockSize);
+      assert src_offset_in_record + length <= numBlocks * m_blockSize : "dst_pos + length > memSize : " + dst_pos + " + " + length + " < " + (numBlocks * m_blockSize);
 
       int left_to_copy = length;
       int src_offset = src_offset_in_record;
@@ -1028,7 +1021,7 @@ public class TreeAllocator implements IMemAllocator {
       buffer.putInt(classNameBytes.length);
       buffer.put(classNameBytes);
 
-	  m_blocks.writeToByteBuffer(buffer);
+      m_blocks.writeToByteBuffer(buffer);
   }
 
   public static TreeAllocator readFromByteBuffer(ByteBuffer buffer) {
@@ -1037,14 +1030,14 @@ public class TreeAllocator implements IMemAllocator {
 
       try {
           Class<?> blockAllocatorClass = Class.forName(new String(classNameBytes));
-          Method readMethod = blockAllocatorClass.getMethod("readFromByteBuffer", ByteBuffer.class);
-
-          return new TreeAllocator((IBlockAllocator)readMethod.invoke(null, buffer));
+          IBlockAllocator blockAllocator = (IBlockAllocator)blockAllocatorClass.newInstance();
+          blockAllocator.readFromByteBuffer(buffer);
+          return new TreeAllocator(blockAllocator);
       } catch(Exception e) {
           throw new RuntimeException();
       }
   }
-  
+
   public TreeAllocator deepCopy() {
 	  return new TreeAllocator(((BlockAllocator)m_blocks).deepCopy());
   }

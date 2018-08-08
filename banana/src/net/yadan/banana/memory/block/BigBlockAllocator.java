@@ -598,4 +598,9 @@ public class BigBlockAllocator implements IBlockAllocator {
   public void writeToByteBuffer(ByteBuffer buffer) {
       throw new UnsupportedOperationException();
   }
+
+  @Override
+  public void readFromByteBuffer(ByteBuffer buffer) {
+    throw new UnsupportedOperationException();
+  }
 }
